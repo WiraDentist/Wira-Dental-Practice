@@ -1,0 +1,44 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 10px;
+}
+
+/* Target the header section */
+header {
+    background-color: #2c3e50;
+    color: #ffffff;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+/* Target the button by its ID */
+#action-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+/* Change button appearance when hovered over */
+#action-btn:hover {
+    background-color: #2980b9;
+}
+/* Target the link inside the header h1 specifically */
+header h1 a {
+    color: inherit; /* Forces the link to use the white color from the header */
+    text-decoration: none; /* Removes the default blue underline */
+}
+
+/* Add a subtle effect when hovering over the header link */
+header h1 a:hover {
+    text-decoration: underline; /* Brings back the underline only when hovering */
+    opacity: 0.9; /* Slightly fades the text to indicate it is clickable */
+}
