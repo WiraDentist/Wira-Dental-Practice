@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wira Dental</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="banner banner-content">
+        <div>
+            <img src="picture/logo.png" class="logo">
+        </div>
+        <div class="text-stack">
+            <p1>Welcome to</p1>
+            <h1><a href="index.html">WIRA</a></h1>
+            <h2><a href="ïndex.html">Dental Practice</a></h2>
+            <p1>your #1 friendly neighbourhood dentist</p1>
+        </div>
+    </header>
+
+    <main>
+        <section id="form-book">
+
+  <div class="header">
+    <h1>🦷 Book an Appointment</h1>
+    <p>Mon – Sat &nbsp;|&nbsp; 08:00 – 17:00</p>
+  </div>
+
+  <div class="card">
+
+    <!-- STEP 1: Date -->
+    <div id="step-date">
+      <div class="step-label">Step 1 of 3</div>
+      <div class="section-title">Select a Date</div>
+      <div class="section-sub">Choose your preferred appointment date.</div>
+      <input type="date" id="datePicker" onchange="handleDateChange(this.value)" />
+    </div>
+
+    <!-- STEP 2: Time -->
+    <div id="step-time" style="display:none;">
+      <button class="btn-back" onclick="goBack('date')">‹ Back</button>
+      <div class="step-label">Step 2 of 3</div>
+      <div class="section-title">Choose a Time</div>
+      <div class="section-sub" id="time-sub"></div>
+      <div class="slots-grid" id="slots-grid"></div>
+      <div class="tip-box">💡 Grey slots are already booked. Tap a green slot to continue.</div>
+    </div>
+
+    <!-- STEP 3: Form -->
+    <div id="step-form" style="display:none;">
+      <button class="btn-back" onclick="goBack('time')">‹ Back</button>
+      <div class="step-label">Step 3 of 3</div>
+      <div class="section-title">Your Details</div>
+      <div class="section-sub" id="form-sub"></div>
+
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="f-name" placeholder="e.g. Budi Santoso" />
+      </div>
+      <div class="form-group">
+        <label>WhatsApp Number *</label>
+        <input type="tel" id="f-phone" placeholder="e.g. 08123456789" />
+      </div>
+      <div class="form-group">
+        <label>Service</label>
+        <select id="f-service">
+          <option>General Checkup</option>
+          <option>Teeth Cleaning</option>
+          <option>Cavity Filling</option>
+          <option>Tooth Extraction</option>
+          <option>Braces Consultation</option>
+          <option>Teeth Whitening</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Notes <span style="font-weight:400;color:#9e8e7e;">(optional)</span></label>
+        <textarea id="f-notes" rows="3" placeholder="Any concerns for the doctor?"></textarea>
+      </div>
+
+      <div class="summary-box" id="form-summary"></div>
+      <button class="btn-primary" onclick="submitBooking()">✓ Confirm Appointment</button>
+    </div>
+
+    <!-- STEP 4: Confirmation -->
+    <div id="step-confirm" style="display:none;">
+      <div class="confirm-icon">✦</div>
+      <div class="confirm-title">You're all set!</div>
+      <div class="confirm-sub" id="confirm-msg"></div>
+      <div class="summary-box" id="confirm-details"></div>
+      <button class="btn-outline" onclick="bookAnother()">Book Another Appointment</button>
+    </div>
+
+  </div>
+
+  <!-- Doctor's View -->
+  <button class="admin-toggle" onclick="toggleAdmin()" id="admin-btn">▼ Doctor's View</button>
+  <div class="admin-panel" id="admin-panel" style="display:none;">
+    <div class="admin-title">📋 Incoming Bookings</div>
+    <div id="admin-list"></div>
+  </div>
+        <section>
+            <button id="button-1">Book an Appoinment</button> 
+        </section>
+    </main>
+
+    <footer id="contact-footer" class="footer-banner">
+        <div class="footer-head">
+            <h4>Contact Us</h4>
+            <h2>Wira Dental Practice</h2>
+        </div>
+        <div class="footer-info">
+            <p><strong>Phone:</strong>&emsp;&emsp;<button id="button-2">+62 858 1353 6200</button></p>
+            <p><strong>Address:</strong>&emsp;Galeri Niaga Mediterania 2 Blok J8D, Jl. Pantai Indah Utara 2, Kapuk Muara, Penjaringan, Jakarta Utara, DKI Jakarta 14460</p>
+        </div>
+        <div>
+        <p class="copyright">&copy;2026 WIRA Dental Practice. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
