@@ -1,41 +1,45 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital:wght@0,40..700:1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital:wght@0,400..700;1,400..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-*{
+
+/* =========================================
+   1. RESET & BASE STYLES
+========================================= */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
+
 html {
-    scroll-behaviour: smooth;
+    scroll-behavior: smooth;
 }
+
 body {
     font-family: 'Lora', serif;
     color: #333;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
     background-color: #EEF2F9;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: scroll;
-    padding-bottom: 140px;
+    overflow-x: hidden;
     padding-top: 130px;
+    padding-bottom: 140px;
 }
 
-header {
-    color: #EEF2F9;
-    margin: 0px;
-    padding: 0px;
-    text-align: center;
-    border-radius: 0px;
-    line-height: 0.8;
-    align-items: center;
+main {
+    line-height: 1.5;
+    padding: 10px;
 }
-footer {
-    line-height: 1;
+
+section {
+    margin-bottom: 5px;
 }
+
+/* =========================================
+   2. TYPOGRAPHY
+========================================= */
 h1 {
     font-family: "Playfair Display", serif;
     font-size: 40px;
@@ -46,129 +50,89 @@ h1 {
     width: 100%;
     text-indent: 10px;
 }
-h2 {
-    font-family: "Lora", serif;
-    font-size: 15px;
-    font-weight: 100;
-    color: #F1D274
-}
-p1 {
-    margin-top: 0px;
-    font-family: "Lora", serif;
-    font-size: 12px;
-}
-p {
-    margin-left: 0px;
-    font-family: "Lora", serif;
-    font-size: 12px;
-    color: #EEF2F9;
-}
-p3 {
-    margin-left: 10px;
-    font-family: "Lora", serif;
-    font-size: 12px;
-    color: #EEF2F9;
-}
-p2 {
-    margin-top: 0px;
-    font-family: "Lora", serif;
-    font-size: 1rem;
-    color: #091528;
-}
-main {
-    line-height: 1.5;
-    padding: 10px;
-}
-h3 {
-    font-family: "Lora", serif;
-    font-size: 2rem;
-    font-weight: 100;
-    color: #091528
-}
-h4 {
-    font-family: "Lora", serif;
-    font-size: 12px;
-    font-weight: 100;
-    color: #EEF2F9
-}
-.logo {
-    width: 3rem;
-    height: auto;
-    position: absolute;
-    left: 10px;
-    top: 20px
-}
 
-section {
-    margin-bottom: 5px;
-}
-
-#button-1 {
-    background-color: #091528;
-    font-family: "Lora", serif;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    margin-bottom: 10px;
-}
-#button-1:hover {
-    background-color: #091528;
-}
-h10 a {
-    background-color: #091528;
-    font-family: "Lora", serif;
-    color: white;
-    border: none !important;
-    outline: none !important;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    text-decoration: none;
-    dispinline-blockblock;
-    box-shadow: none !important;
-    width: auto;
-    text-align: center;
-}
-h10 a:hover {
-     text-decoration: underline;
-     opacity: 0.9;
-}
-#button-2 {
-    background-color: #091528;
-    font-family: "Lora", serif;
-    color: white;
-    border: none;
-    font-size: 12px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-#button-2:hover {
-    background-color: #091528;
-}
 h1 a {
     color: inherit; 
     text-decoration: none; 
     display: block;
 }
+
 h1 a:hover {
     text-decoration: underline; 
     opacity: 0.9; 
 }
+
+h2 {
+    font-family: "Lora", serif;
+    font-size: 15px;
+    font-weight: 100;
+    color: #F1D274;
+}
+
 h2 a {
     color: inherit; 
     text-decoration: none;
     display: inline-block;
 }
+
 h2 a:hover {
     text-decoration: underline; 
     opacity: 0.9; 
 }
+
+h3 {
+    font-family: "Lora", serif;
+    font-size: 2rem;
+    font-weight: 100;
+    color: #091528;
+}
+
+h4 {
+    font-family: "Lora", serif;
+    font-size: 12px;
+    font-weight: 100;
+    color: #EEF2F9;
+}
+
+/* Custom Paragraph Classes */
+p {
+    font-family: "Lora", serif;
+    font-size: 12px;
+    color: #EEF2F9;
+}
+
+.p1 {
+    margin-top: 0px;
+    font-family: "Lora", serif;
+    font-size: 12px;
+    color: #EEF2F9;
+}
+
+.p2 {
+    margin-top: 0px;
+    font-family: "Lora", serif;
+    font-size: 1rem;
+    color: #091528;
+}
+
+.p3 {
+    margin-left: 10px;
+    font-family: "Lora", serif;
+    font-size: 12px;
+    color: #EEF2F9;
+}
+
+/* =========================================
+   3. LAYOUT (Header & Footer)
+========================================= */
+.logo {
+    width: 3rem;
+    height: auto;
+    position: absolute;
+    left: 10px;
+    top: 20px;
+}
+
 .text-stack {
     display: flex;
     flex-direction: column;
@@ -176,14 +140,11 @@ h2 a:hover {
     align-items: center;
     gap: 15px;
 }
+
 .banner {
     background-color: #0A1628;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     width: 100%;
     height: 130px;
-    max-width: none;
     display: flex;
     position: fixed;
     z-index: 9999;
@@ -192,37 +153,32 @@ h2 a:hover {
     justify-content: center;
     align-items: center;
     text-align: center;
-    margin: 0;
-    padding: 0;
-    border-radius: 0;
     box-shadow: 0px 8px 15px -5px #F1D274;
     transition: transform 0.3s ease-in-out;
+    color: #EEF2F9;
 }
+
 .banner.hide {
     transform: translateY(-100%);
 }
+
 .banner-content {
     width: 100%;
 }
+
 .footer-banner {
     background-color: #0A1628;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     width: 100%;
     height: 140px;
-    max-width: none;
     position: fixed;
-    justify-content: start;
-    align-items: left;
-    text-align: left;
-    margin: 0;
-    padding: 0;
-    border-radius: 0;
     left: 0;
     bottom: 0;
+    justify-content: start;
+    text-align: left;
     box-shadow: 0px -8px 15px -5px #F1D274;
+    line-height: 1;
 }
+
 .footer-head {
     margin-left: 10px;
     margin-top: 10px;
@@ -239,23 +195,166 @@ h2 a:hover {
     margin-top: 10px;
 }
 
-.form-book {
-    background-color: #091528;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 100%;
-}
-
-#button-3 {
+/* =========================================
+   4. BUTTONS
+========================================= */
+#btn-wa, #btn-web {
     background-color: #091528;
     font-family: "Lora", serif;
     color: white;
     border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 300px;
+    display: block;
+}
+
+#btn-wa:hover, #btn-web:hover {
+    opacity: 0.9;
+}
+
+#btn-phone, #btn-phone-footer, #btn-address {
+    background-color: transparent;
+    font-family: "Lora", serif;
+    color: inherit;
+    border: none;
     font-size: 12px;
     cursor: pointer;
+    transition: opacity 0.3s ease;
+    text-align: left;
+}
+
+#btn-phone:hover, #btn-phone-footer:hover, #btn-address:hover {
+    text-decoration: underline;
+    opacity: 0.9;
+}
+
+/* =========================================
+   5. BOOKING FORM UI
+========================================= */
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.step-label { font-size: 12px; color: #666; margin-bottom: 5px; }
+.section-title { font-size: 1.5rem; color: #091528; font-weight: 700; margin-bottom: 5px; }
+.section-sub { font-size: 14px; color: #666; margin-bottom: 15px; }
+
+/* Form Inputs */
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #091528; }
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: "Lora", serif;
+    font-size: 14px;
+}
+
+/* Time Slots Grid */
+.slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.slot {
+    padding: 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 5px;
+    font-family: "Lora", serif;
+    font-size: 14px;
+    background-color: #fff;
+    transition: all 0.2s ease;
+}
+
+.slot small { display: block; font-size: 10px; margin-top: 5px; }
+
+.slot.available { 
+    background-color: #d4edda; 
+    color: #155724; 
+    border-color: #c3e6cb; 
+}
+
+.slot.available:hover { background-color: #c3e6cb; }
+
+.slot.booked { 
+    background-color: #e2e3e5; 
+    color: #383d41; 
+    cursor: not-allowed; 
+    border-color: #d6d8db; 
+}
+
+/* Form Buttons & Feedback */
+.btn-back {
+    background: none;
+    border: none;
+    color: #091528;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 15px;
+    font-family: "Lora", serif;
+    text-decoration: underline;
+    padding: 0;
+}
+
+.btn-primary {
+    background-color: #091528;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-family: "Lora", serif;
+    transition: opacity 0.3s ease;
+}
+
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-outline {
+    background-color: transparent;
+    color: #091528;
+    border: 1px solid #091528;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-family: "Lora", serif;
+    margin-top: 10px;
     transition: background 0.3s ease;
 }
-#button-3:hover {
-    background-color: #091528;
+
+.btn-outline:hover { background-color: #EEF2F9; }
+
+.summary-box {
+    background: #EEF2F9;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #091528;
+    border: 1px solid #dce4f0;
 }
+
+.tip-box { font-size: 12px; color: #666; margin-top: 10px; font-style: italic; }
+
+/* Confirmation Screen */
+.confirm-icon { font-size: 40px; color: #F1D274; text-align: center; margin-bottom: 10px; }
+.confirm-title { font-size: 1.5rem; text-align: center; color: #091528; margin-bottom: 5px; }
+.confirm-sub { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
