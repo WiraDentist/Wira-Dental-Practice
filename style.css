@@ -16,16 +16,13 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-}
-
-body {
     background-color: #EEF2F9;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: scroll;
-    padding-bottom: 160px;
-    padding-top: 200px;
+    padding-bottom: 40px;
+    padding-top: 5px;
 }
 
 header {
@@ -34,15 +31,15 @@ header {
     padding: 0px;
     text-align: center;
     border-radius: 5px;
-    line-height: 10px;
+    line-height: 0.8;
     align-items: center;
 }
 footer {
-    line-height: 1.2;
+    line-height: 1;
 }
 h1 {
     font-family: "Playfair Display", serif;
-    font-size: 4rem;
+    font-size: 30px;
     font-weight: 100;
     letter-spacing: 15px;
     line-height: 0.5;
@@ -52,19 +49,19 @@ h1 {
 }
 h2 {
     font-family: "Lora", serif;
-    font-size: 1.3rem;
+    font-size: 10px;
     font-weight: 100;
     color: #F1D274
 }
 p1 {
     margin-top: 0px;
     font-family: "Lora", serif;
-    font-size: 1rem;
+    font-size: 10px;
 }
 p {
     margin-top: 0px;
     font-family: "Lora", serif;
-    font-size: 1rem;
+    font-size: 8px;
     color: #EEF2F9;
 }
 p2 {
@@ -85,7 +82,7 @@ h3 {
 }
 h4 {
     font-family: "Lora", serif;
-    font-size: 1rem;
+    font-size: 10px;
     font-weight: 100;
     color: #EEF2F9
 }
@@ -98,7 +95,7 @@ h4 {
 }
 
 section {
-    margin-bottom: 2rem;
+    margin-bottom: 5px;
 }
 
 #button-1 {
@@ -158,7 +155,7 @@ h2 a:hover {
     background-position: center;
     background-repeat: no-repeat;
     width: 100%;
-    height: 200px;
+    height: 150px;
     max-width: none;
     display: flex;
     position: fixed;
@@ -186,7 +183,7 @@ h2 a:hover {
     background-position: center;
     background-repeat: no-repeat;
     width: 100%;
-    height: 200px;
+    height: 100px;
     max-width: none;
     position: fixed;
     justify-content: start;
@@ -200,18 +197,18 @@ h2 a:hover {
     box-shadow: 0px -8px 15px -5px #F1D274;
 }
 .footer-head {
-    margin-left: 20px;
-    margin-top: 15px;
+    margin-left: 10px;
+    margin-top: 5px;
 }
 
 .footer-info {
-    margin-left: 20px;
-    margin-top: 10px;
+    margin-left: 10px;
+    margin-top: 5px;
 }
 
 .copyright {
-    margin-left: 20px;   
-    margin-top: 10px;
+    margin-left: 10px;   
+    margin-top: 5px;
 }
 
 .form-book {
