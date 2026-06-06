@@ -75,7 +75,7 @@ function initGlobalUI() {
     // Index Page Buttons
     const btnWa = document.getElementById('btn-wa');
     if (btnWa) {
-        btnWa.addEventListener('click', () => {
+        btnWa.addEventListener('click', function () {
             window.open('https://wa.me/6285813536200?text=Hello!%20I%20would%20like%20to%20book%20an%20appointment.', '_blank');
             document.body.style.backgroundColor = '#e8f4f8';
         });
