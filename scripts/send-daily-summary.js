@@ -1,12 +1,11 @@
 // =============================================================================
-//  WIRA DENTAL — Daily Appointment Summary Emailer  (v3)
+//  WIRA DENTAL — Daily Appointment Summary Emailer  (v4 — plain text fix)
 // =============================================================================
 
-// Credentials hardcoded — same values already public in your script.js
-const FIREBASE_DB_URL = 'https://wiradentist-1947f-default-rtdb.firebaseio.com';
-const EMAILJS_SVC_ID  = 'service_5uu042s';
-const EMAILJS_TMPL_ID = 'template_16k53bi';
-const EMAILJS_KEY     = 'xflDajxK7KdzCGn-8';
+const FIREBASE_DB_URL    = 'https://wiradentist-1947f-default-rtdb.firebaseio.com';
+const EMAILJS_SVC_ID     = 'service_5uu042s';
+const EMAILJS_TMPL_ID    = 'template_16k53bi';
+const EMAILJS_KEY        = 'xflDajxK7KdzCGn-8';
 
 // ─── DATE HELPERS (WIB = UTC+7) ──────────────────────────────────────────────
 
@@ -41,103 +40,63 @@ async function fetchTomorrowBookings(tomorrowDate) {
         .sort((a, b) => a.time.localeCompare(b.time));
 }
 
-// ─── HTML EMAIL BUILDER ───────────────────────────────────────────────────────
+// ─── PLAIN TEXT SUMMARY BUILDER ───────────────────────────────────────────────
+// No HTML tags — just clean formatted text.
+// The EmailJS template wraps this in a styled box via its own HTML.
 
-function buildSummaryHTML(bookings, tomorrowDate) {
+function buildSummaryText(bookings, tomorrowDate) {
 
     if (isSunday(tomorrowDate)) {
-        return `
-        <div style="padding:16px 20px;background:#fff8e1;border-left:4px solid #f1d274;
-                    border-radius:0 8px 8px 0;color:#7a6000;font-family:Arial,sans-serif;">
-            <strong>🏖️ Sunday — Clinic is CLOSED.</strong><br>No appointments scheduled.
-        </div>`;
+        return '🏖️  Sunday — Clinic is CLOSED.\nNo appointments scheduled.';
     }
 
     if (bookings.length === 0) {
-        return `
-        <div style="padding:16px 20px;background:#e8f5e9;border-left:4px solid #4caf50;
-                    border-radius:0 8px 8px 0;color:#2e7d32;font-family:Arial,sans-serif;">
-            <strong>✅ No appointments scheduled for tomorrow.</strong>
-        </div>`;
+        return '✅  No appointments scheduled for tomorrow.';
     }
 
-    const cards = bookings.map((b, i) => `
-        <div style="font-family:Arial,sans-serif;margin-bottom:16px;border:1px solid #e0e0e0;
-                    border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+    const divider = '─────────────────────────────────';
 
-            <div style="background:#0a1628;padding:10px 16px;">
-                <span style="background:#f1d274;color:#0a1628;font-weight:bold;font-size:13px;
-                             border-radius:50%;width:24px;height:24px;display:inline-flex;
-                             align-items:center;justify-content:center;margin-right:10px;">
-                    ${i + 1}
-                </span>
-                <span style="color:#ffffff;font-weight:bold;font-size:15px;">
-                    🕐 &nbsp;${b.time}
-                </span>
-            </div>
-
-            <div style="padding:12px 16px;background:#ffffff;">
-                <table style="border-collapse:collapse;width:100%;font-size:14px;color:#333;">
-                    <tr>
-                        <td style="padding:5px 12px 5px 0;color:#888;white-space:nowrap;vertical-align:top;">
-                            👤 &nbsp;<strong>Patient</strong>
-                        </td>
-                        <td style="padding:5px 0;font-weight:bold;color:#0a1628;">
-                            ${b.name}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding:5px 12px 5px 0;color:#888;white-space:nowrap;vertical-align:top;">
-                            📞 &nbsp;<strong>Phone</strong>
-                        </td>
-                        <td style="padding:5px 0;color:#333;">
-                            ${b.phone}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding:5px 12px 5px 0;color:#888;white-space:nowrap;vertical-align:top;">
-                            🦷 &nbsp;<strong>Service</strong>
-                        </td>
-                        <td style="padding:5px 0;color:#333;">
-                            ${b.service}
-                        </td>
-                    </tr>
-                    ${b.notes ? `
-                    <tr>
-                        <td colspan="2" style="padding:8px 0 2px 0;">
-                            <div style="background:#f5f5f5;border-radius:6px;padding:8px 12px;
-                                        color:#555;font-size:13px;border-left:3px solid #f1d274;">
-                                📝 &nbsp;<strong>Notes:</strong> &nbsp;${b.notes}
-                            </div>
-                        </td>
-                    </tr>` : ''}
-                </table>
-            </div>
-
-        </div>
-    `).join('');
-
-    return cards;
+    return bookings.map((b, i) => {
+        const lines = [
+            `${i + 1}.  🕐  ${b.time}`,
+            `    👤  Patient  :  ${b.name}`,
+            `    📞  Phone    :  ${b.phone}`,
+            `    🦷  Service  :  ${b.service}`,
+        ];
+        if (b.notes) {
+            lines.push(`    📝  Notes    :  ${b.notes}`);
+        }
+        return lines.join('\n');
+    }).join(`\n\n${divider}\n\n`);
 }
 
 // ─── EMAILJS REST API ─────────────────────────────────────────────────────────
 
-async function sendSummaryEmail(tomorrowDate, summaryHTML, count) {
+async function sendSummaryEmail(tomorrowDate, summaryText, count) {
     console.log(`Sending email for ${count} appointment(s)...`);
+
+    const payload = {
+        service_id:      EMAILJS_SVC_ID,
+        template_id:     EMAILJS_TMPL_ID,
+        user_id:         EMAILJS_KEY,
+        template_params: {
+            tomorrow_date: formatDateLong(tomorrowDate),
+            summary:       summaryText,
+            count:         String(count)
+        }
+    };
+
+    // Include private key only if provided (strict mode)
+    if (EMAILJS_PRIVATE_KEY) {
+        payload.accessToken = EMAILJS_PRIVATE_KEY;
+    }
+
     const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            service_id:      EMAILJS_SVC_ID,
-            template_id:     EMAILJS_TMPL_ID,
-            user_id:         EMAILJS_KEY,
-            template_params: {
-                tomorrow_date: formatDateLong(tomorrowDate),
-                summary:       summaryHTML,
-                count:         String(count)
-            }
-        })
+        body:    JSON.stringify(payload)
     });
+
     if (!res.ok) {
         const errBody = await res.text();
         throw new Error(`EmailJS failed: ${res.status} — ${errBody}`);
@@ -153,8 +112,8 @@ async function main() {
     const bookings = await fetchTomorrowBookings(tomorrowDate);
     console.log(`Found: ${bookings.length} booking(s)`);
 
-    const summaryHTML = buildSummaryHTML(bookings, tomorrowDate);
-    await sendSummaryEmail(tomorrowDate, summaryHTML, bookings.length);
+    const summaryText = buildSummaryText(bookings, tomorrowDate);
+    await sendSummaryEmail(tomorrowDate, summaryText, bookings.length);
     console.log('Done! Email sent successfully.');
 }
 
