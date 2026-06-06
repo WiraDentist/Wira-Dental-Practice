@@ -86,11 +86,6 @@ async function sendSummaryEmail(tomorrowDate, summaryText, count) {
         }
     };
 
-    // Include private key only if provided (strict mode)
-    if (EMAILJS_PRIVATE_KEY) {
-        payload.accessToken = EMAILJS_PRIVATE_KEY;
-    }
-
     const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
