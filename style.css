@@ -11,7 +11,6 @@ html {
 }
 body {
     font-family: 'Lora', serif;
-    background-color: #091528;
     color: #333;
     margin: 0;
     padding: 0;
@@ -21,7 +20,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: scroll;
-    padding-bottom: 40px;
+    padding-bottom: 10px;
     padding-top: 5px;
 }
 
@@ -30,7 +29,7 @@ header {
     margin: 0px;
     padding: 0px;
     text-align: center;
-    border-radius: 5px;
+    border-radius: 0px;
     line-height: 0.8;
     align-items: center;
 }
@@ -39,7 +38,7 @@ footer {
 }
 h1 {
     font-family: "Playfair Display", serif;
-    font-size: 30px;
+    font-size: 40px;
     font-weight: 100;
     letter-spacing: 15px;
     line-height: 0.5;
@@ -49,19 +48,19 @@ h1 {
 }
 h2 {
     font-family: "Lora", serif;
-    font-size: 10px;
+    font-size: 20px;
     font-weight: 100;
     color: #F1D274
 }
 p1 {
     margin-top: 0px;
     font-family: "Lora", serif;
-    font-size: 10px;
+    font-size: 13px;
 }
 p {
     margin-top: 0px;
     font-family: "Lora", serif;
-    font-size: 8px;
+    font-size: 13px;
     color: #EEF2F9;
 }
 p2 {
@@ -72,7 +71,7 @@ p2 {
 }
 main {
     line-height: 1.5;
-    padding: 2rem;
+    padding: 10px;
 }
 h3 {
     font-family: "Lora", serif;
@@ -82,7 +81,7 @@ h3 {
 }
 h4 {
     font-family: "Lora", serif;
-    font-size: 10px;
+    font-size: 17px;
     font-weight: 100;
     color: #EEF2F9
 }
@@ -117,7 +116,7 @@ section {
     font-family: "Lora", serif;
     color: white;
     border: none;
-    font-size: 16px;
+    font-size: 13px;
     cursor: pointer;
     transition: background 0.3s ease;
 }
@@ -147,7 +146,7 @@ h2 a:hover {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 25px;
+    gap: 18px;
 }
 .banner {
     background-color: #0A1628;
