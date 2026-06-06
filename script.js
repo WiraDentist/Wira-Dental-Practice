@@ -31,185 +31,51 @@ document.addEventListener("DOMContentLoaded", function() {
     
 });
 
-  // ── Config — edit these to match your clinic ──────────────────────────────
   const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
-  // 12:00 is skipped (lunch break)
-
-  // ── State ─────────────────────────────────────────────────────────────────
   let selectedDate = null;
   let selectedTime = null;
 
-  // ── Data layer ────────────────────────────────────────────────────────────
-  // This demo uses localStorage. In your real website, replace these two
-  // functions with fetch() calls to get_slots.php and book.php (see those files).
-
-  function getBookedSlots(date) {
-    const all = JSON.parse(localStorage.getItem('dental_bookings') || '[]');
-    return all.filter(b => b.date === date).map(b => b.time);
-  }
-
-  function getAllBookings() {
-    return JSON.parse(localStorage.getItem('dental_bookings') || '[]');
-  }
-
-  function saveBooking(booking) {
-    const all = getAllBookings();
-    all.push(booking);
-    localStorage.setItem('dental_bookings', JSON.stringify(all));
-  }
-
-  // ── Step navigation ───────────────────────────────────────────────────────
-  function showStep(name) {
-    ['date','time','form','confirm'].forEach(s => {
-      document.getElementById('step-' + s).style.display = s === name ? 'block' : 'none';
-    });
-  }
-
-  function goBack(step) {
-    selectedTime = null;
-    if (step === 'time') renderSlots();
-    showStep(step);
-  }
-
-  // ── Date selection ────────────────────────────────────────────────────────
-  const todayStr = new Date().toISOString().split('T')[0];
-  document.getElementById('datePicker').min = todayStr;
-
-  function handleDateChange(val) {
-    if (!val) return;
-    const dayOfWeek = new Date(val + 'T00:00:00').getDay();
-    if (dayOfWeek === 0) { // Sunday
-      alert('The clinic is closed on Sundays. Please choose another day.');
-      document.getElementById('datePicker').value = '';
-      return;
-    }
-    selectedDate = val;
-    selectedTime = null;
-    document.getElementById('time-sub').textContent = formatDate(val);
-    renderSlots();
-    showStep('time');
-  }
-
-  // ── Render time slots ─────────────────────────────────────────────────────
   function renderSlots() {
-    // REAL SITE: swap the line below with a fetch to get_slots.php
-    // fetch('/get_slots.php?date=' + selectedDate)
-    //   .then(r => r.json()).then(booked => buildSlotGrid(booked));
-    buildSlotGrid(getBookedSlots(selectedDate)); // demo version
+    fetch('get_slots.php?date=' + selectedDate)
+      .then(r => r.json())
+      .then(booked => buildSlotGrid(booked));
   }
 
   function buildSlotGrid(booked) {
     document.getElementById('slots-grid').innerHTML = TIME_SLOTS.map(slot => {
       const isBooked = booked.includes(slot);
-      return `<button class="slot ${isBooked ? 'booked' : 'available'}"
-        ${isBooked ? 'disabled' : ''}
-        onclick="selectTime('${slot}')">
-        ${slot}
-        <small>${isBooked ? 'Booked' : 'Available'}</small>
-      </button>`;
+      return `<button class="slot ${isBooked ? 'booked' : 'available'}" ${isBooked ? 'disabled' : ''} onclick="selectTime('${slot}')">
+        ${slot} <small>${isBooked ? 'Booked' : 'Available'}</small></button>`;
     }).join('');
   }
 
-  function selectTime(time) {
-    selectedTime = time;
-    document.getElementById('form-sub').textContent = formatDateShort(selectedDate) + ' · ' + time;
-    document.getElementById('form-summary').innerHTML =
-      `<strong>📅 Date:</strong> ${formatDate(selectedDate)}<br>` +
-      `<strong>🕐 Time:</strong> ${time}`;
-    showStep('form');
-  }
-
-  // ── Submit booking ────────────────────────────────────────────────────────
   function submitBooking() {
-    const name    = document.getElementById('f-name').value.trim();
-    const phone   = document.getElementById('f-phone').value.trim();
-    const service = document.getElementById('f-service').value;
-    const notes   = document.getElementById('f-notes').value.trim();
+    const booking = {
+      name: document.getElementById('f-name').value,
+      phone: document.getElementById('f-phone').value,
+      service: document.getElementById('f-service').value,
+      notes: document.getElementById('f-notes').value,
+      date: selectedDate,
+      time: selectedTime
+    };
 
-    if (!name || !phone) {
-      alert('Please fill in your name and WhatsApp number.');
-      return;
-    }
-
-    const booking = { id: Date.now(), name, phone, service, notes, date: selectedDate, time: selectedTime };
-
-    // REAL SITE: replace saveBooking() with:
-    // fetch('/book.php', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(booking)
-    // });
-    saveBooking(booking); // demo version
-
-    document.getElementById('confirm-msg').innerHTML =
-      `We'll send a reminder to WhatsApp <strong>${phone}</strong> shortly.`;
-    document.getElementById('confirm-details').innerHTML =
-      `👤 ${name}<br>🦷 ${service}<br>📅 ${formatDate(selectedDate)}<br>🕐 ${selectedTime}` +
-      (notes ? `<br>📝 <em>${notes}</em>` : '');
-
-    showStep('confirm');
-    if (document.getElementById('admin-panel').style.display !== 'none') renderAdmin();
-  }
-
-  // ── Reset ─────────────────────────────────────────────────────────────────
-  function bookAnother() {
-    selectedDate = null; selectedTime = null;
-    document.getElementById('datePicker').value = '';
-    ['f-name','f-phone','f-notes'].forEach(id => document.getElementById(id).value = '');
-    showStep('date');
-  }
-
-  // ── Admin / Doctor's View ─────────────────────────────────────────────────
-  let adminOpen = false;
-  function toggleAdmin() {
-    adminOpen = !adminOpen;
-    document.getElementById('admin-panel').style.display = adminOpen ? 'block' : 'none';
-    document.getElementById('admin-btn').textContent = adminOpen ? '▲ Hide Doctor\'s View' : '▼ Doctor\'s View';
-    if (adminOpen) renderAdmin();
+    fetch('book.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(booking)
+    }).then(r => r.json()).then(res => {
+      if (res.success) showStep('confirm');
+      else alert('Error saving booking.');
+    });
   }
 
   function renderAdmin() {
-    const password = prompt("Enter Dentist's Password:");
-    if (!password) return; 
-
-    // Fetch data using the password as a URL parameter
-    fetch('get_all.php?auth=' + encodeURIComponent(password))
-        .then(r => {
-            if (r.status === 403) {
-                alert("Incorrect password!");
-                return null;
-            }
-            return r.json();
-        })
-        .then(bookings => {
-            if (!bookings) return;
-            
-            const el = document.getElementById('admin-list');
-            if (!bookings.length) {
-                el.innerHTML = '<div class="no-bookings">No bookings yet.</div>';
-                return;
-            }
-            
-            el.innerHTML = bookings.reverse().map(b => `
-              <div class="booking-card">
-                <span class="bc-badge">${b.time}</span>
-                <div class="bc-name">${b.name}</div>
-                <div class="bc-info">${b.service} · ${b.date} · ${b.phone}</div>
-              </div>`).join('');
-        });
-}
-
-
-  // ── Date helpers ──────────────────────────────────────────────────────────
-  function formatDate(str) {
-    return new Date(str + 'T00:00:00').toLocaleDateString('en-GB', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-    });
+    const pass = prompt("Enter Password:");
+    fetch('get_all.php?auth=' + encodeURIComponent(pass))
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('admin-list').innerHTML = data.map(b => 
+          `<div class="booking-card">${b.time} - ${b.name} (${b.date})</div>`).join('');
+      });
   }
-  function formatDateShort(str) {
-    return new Date(str + 'T00:00:00').toLocaleDateString('en-GB', {
-      weekday: 'short', day: 'numeric', month: 'short'
-    });
-  }
-
-  showStep('date');
+  // Keep your showStep, handleDateChange, etc. as they were.
