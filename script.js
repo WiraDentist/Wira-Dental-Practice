@@ -31,68 +31,69 @@ document.addEventListener("DOMContentLoaded", function() {
     
 });
 
-  const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
-  let selectedDate = null;
-  let selectedTime = null;
-  let adminOpen = false;
+const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
+let selectedDate = null;
+let selectedTime = null;
 
-  function renderSlots() {
-    fetch('get_slots.php?date=' + selectedDate)
-      .then(r => r.text())
-      .then(text => {
-        const booked = text ? text.split(',') : [];
-        buildSlotGrid(booked);
-      });
-  }
+// ── Date Selection ──────────────────────────────────────────────────────
+const todayStr = new Date().toISOString().split('T')[0];
+document.getElementById('datePicker').min = todayStr;
 
-  function buildSlotGrid(booked) {
+function handleDateChange(val) {
+    selectedDate = val;
+    renderSlots();
+    showStep('time');
+}
+
+// ── Render Slots ────────────────────────────────────────────────────────
+function renderSlots() {
     document.getElementById('slots-grid').innerHTML = TIME_SLOTS.map(slot => {
-      const isBooked = booked.includes(slot);
-      return `<button class="slot ${isBooked ? 'booked' : 'available'}" 
-              ${isBooked ? 'disabled' : ''} onclick="selectTime('${slot}')">
-              ${slot} <small>${isBooked ? 'Booked' : 'Available'}</small></button>`;
+        return `<button class="slot available" onclick="selectTime('${slot}')">
+                ${slot}</button>`;
     }).join('');
-  }
+}
 
-  function submitBooking() {
-    const booking = {
-      name: document.getElementById('f-name').value,
-      phone: document.getElementById('f-phone').value,
-      service: document.getElementById('f-service').value,
-      notes: document.getElementById('f-notes').value,
-      date: selectedDate,
-      time: selectedTime
+function selectTime(time) {
+    selectedTime = time;
+    showStep('form');
+}
+
+// ── Submit via EmailJS ──────────────────────────────────────────────────
+function submitBooking() {
+    const templateParams = {
+        name: document.getElementById('f-name').value,
+        phone: document.getElementById('f-phone').value,
+        service: document.getElementById('f-service').value,
+        notes: document.getElementById('f-notes').value,
+        date: selectedDate,
+        time: selectedTime
     };
 
-    fetch('book.php', {
-      method: 'POST',
-      body: JSON.stringify(booking)
-    }).then(r => r.text()).then(res => {
-      if (res === "success") showStep('confirm');
-      else alert('Error: ' + res);
+    if (!templateParams.name || !templateParams.phone) {
+        alert('Please fill in your name and WhatsApp number.');
+        return;
+    }
+
+    // REPLACE WITH YOUR SERVICE ID AND TEMPLATE ID
+    emailjs.send("service_4h4h9xq", "template_4vd13ff", templateParams)
+        .then(function(response) {
+            document.getElementById('confirm-msg').innerHTML = "Booking request sent to Wira Dental!";
+            showStep('confirm');
+        }, function(error) {
+            alert("Booking failed. Please try again.");
+            console.error("EmailJS error:", error);
+        });
+}
+
+// ── Navigation & Helpers ────────────────────────────────────────────────
+function showStep(name) {
+    ['date','time','form','confirm'].forEach(s => {
+        document.getElementById('step-' + s).style.display = s === name ? 'block' : 'none';
     });
-  }
+}
 
-  function toggleAdmin() {
-    adminOpen = !adminOpen;
-    document.getElementById('admin-panel').style.display = adminOpen ? 'block' : 'none';
-    if (adminOpen) renderAdmin();
-  }
+function toggleAdmin() {
+    alert("On GitHub Pages, you can view your bookings in your email inbox.");
+}
 
-  function renderAdmin() {
-    const pass = prompt("Enter Dentist's Password:");
-    if (!pass) return;
-    
-    fetch('get_all.php?auth=' + encodeURIComponent(pass))
-      .then(r => r.text())
-      .then(text => {
-        const el = document.getElementById('admin-list');
-        if (!text.trim()) { el.innerHTML = "No bookings."; return; }
-        
-        const rows = text.trim().split('\n');
-        el.innerHTML = rows.map(row => {
-          const [name, phone, service, date, time] = row.split('|');
-          return `<div class="booking-card">${date} ${time} - ${name} (${phone})</div>`;
-        }).join('');
-      });
-  }
+showStep('date');
