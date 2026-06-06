@@ -304,6 +304,7 @@ function initBookingFlow() {
         
         document.getElementById('confirm-details').innerHTML = `
             👤 ${bookingData.name}<br>
+            📞 ${bookingData.phone}<br>
             🦷 ${bookingData.service}<br>
             📅 ${formatDate(bookingData.date)}<br>
             🕐 ${bookingData.time}
