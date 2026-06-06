@@ -31,7 +31,8 @@ document.addEventListener("DOMContentLoaded", function() {
     
 });
 
-const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
+  // ── Config — edit these to match your clinic ──────────────────────────────
+  const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
   // 12:00 is skipped (lunch break)
 
   // ── State ─────────────────────────────────────────────────────────────────
@@ -168,21 +169,27 @@ const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:
   }
 
   function renderAdmin() {
-    const password = prompt("Enter Doctor's Password:");
-    if (!password) return; // Exit if they click cancel
+    const password = prompt("Enter Dentist's Password:");
+    if (!password) return; 
 
-    fetch('allbooks.php?auth=' + password)
+    // Fetch data using the password as a URL parameter
+    fetch('get_all.php?auth=' + encodeURIComponent(password))
         .then(r => {
             if (r.status === 403) {
                 alert("Incorrect password!");
-                return [];
+                return null;
             }
             return r.json();
         })
         .then(bookings => {
-            if (!Array.isArray(bookings)) return;
+            if (!bookings) return;
+            
             const el = document.getElementById('admin-list');
-            // ... (rest of your existing render code here)
+            if (!bookings.length) {
+                el.innerHTML = '<div class="no-bookings">No bookings yet.</div>';
+                return;
+            }
+            
             el.innerHTML = bookings.reverse().map(b => `
               <div class="booking-card">
                 <span class="bc-badge">${b.time}</span>
@@ -192,15 +199,6 @@ const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:
         });
 }
 
-    }
-    el.innerHTML = bookings.map(b => `
-      <div class="booking-card">
-        <span class="bc-badge">${b.time}</span>
-        <div class="bc-name">${b.name}</div>
-        <div class="bc-info">${b.service} · ${b.date} · ${b.phone}</div>
-        ${b.notes ? `<div class="bc-info" style="font-style:italic;">📝 ${b.notes}</div>` : ''}
-      </div>`).join('');
-  }
 
   // ── Date helpers ──────────────────────────────────────────────────────────
   function formatDate(str) {
