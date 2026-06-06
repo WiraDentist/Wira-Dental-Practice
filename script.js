@@ -14,7 +14,7 @@ button2.addEventListener('click', function() {
 
 const button3 = document.getElementById('button-2');
 button2.addEventListener('click', function() {
-    window.open('https://maps.app.goo.gl/kNoYr9k5xs5b4chY8');
+    window.open('https://maps.app.goo.gl/kNoYr9k5xs5b4chY');
     document.body.style.backgroundColor = '#e8f4f8';
     alert('Thank you for contacting us!');
 });

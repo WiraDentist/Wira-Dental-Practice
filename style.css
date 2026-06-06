@@ -20,8 +20,8 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: scroll;
-    padding-bottom: 10px;
-    padding-top: 5px;
+    padding-bottom: 140px;
+    padding-top: 130px;
 }
 
 header {
@@ -113,9 +113,31 @@ section {
     border-radius: 5px;
     cursor: pointer;
     transition: background 0.3s ease;
+    margin-bottom: 10px;
 }
 #button-1:hover {
     background-color: #091528;
+}
+h10 a {
+    background-color: #091528;
+    font-family: "Lora", serif;
+    color: white;
+    border: none !important;
+    outline: none !important;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-decoration: none;
+    dispinline-blockblock;
+    box-shadow: none !important;
+    width: auto;
+    text-align: center;
+}
+h10 a:hover {
+     text-decoration: underline;
+     opacity: 0.9;
 }
 #button-2 {
     background-color: #091528;
