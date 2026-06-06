@@ -31,11 +31,11 @@ document.addEventListener("DOMContentLoaded", function() {
     
 });
 
-const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
+const TIME_SLOTS = ['08:00', '09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
 let selectedDate = null;
 let selectedTime = null;
 
-// ── Date Selection ──────────────────────────────────────────────────────
+// ── Date Handling ───────────────────────────────────────────────────────
 const todayStr = new Date().toISOString().split('T')[0];
 document.getElementById('datePicker').min = todayStr;
 
@@ -45,11 +45,10 @@ function handleDateChange(val) {
     showStep('time');
 }
 
-// ── Render Slots ────────────────────────────────────────────────────────
+// ── Slot Rendering ──────────────────────────────────────────────────────
 function renderSlots() {
     document.getElementById('slots-grid').innerHTML = TIME_SLOTS.map(slot => {
-        return `<button class="slot available" onclick="selectTime('${slot}')">
-                ${slot}</button>`;
+        return `<button class="slot available" onclick="selectTime('${slot}')">${slot}</button>`;
     }).join('');
 }
 
@@ -58,7 +57,7 @@ function selectTime(time) {
     showStep('form');
 }
 
-// ── Submit via EmailJS ──────────────────────────────────────────────────
+// ── Submit via EmailJS (No backend needed) ──────────────────────────────
 function submitBooking() {
     const templateParams = {
         name: document.getElementById('f-name').value,
@@ -68,32 +67,38 @@ function submitBooking() {
         date: selectedDate,
         time: selectedTime
     };
-
+    
     if (!templateParams.name || !templateParams.phone) {
         alert('Please fill in your name and WhatsApp number.');
         return;
     }
-
-    // REPLACE WITH YOUR SERVICE ID AND TEMPLATE ID
-    emailjs.send("service_4h4h9xq", "template_4vd13ff", templateParams)
-        .then(function(response) {
-            document.getElementById('confirm-msg').innerHTML = "Booking request sent to Wira Dental!";
+    
+    // Replace with your Service ID and Template ID from EmailJS
+    emailjs.send("service_5uu042s", "template_5fdmlsj", templateParams)
+        .then(() => {
+            document.getElementById('confirm-msg').innerHTML = "Appointment request sent to Wira Dental!";
             showStep('confirm');
-        }, function(error) {
-            alert("Booking failed. Please try again.");
-            console.error("EmailJS error:", error);
+        }, (err) => {
+            alert("Booking failed. Check console for details.");
+            console.error("EmailJS Error:", err);
         });
 }
 
-// ── Navigation & Helpers ────────────────────────────────────────────────
+// ── Admin Toggle (Password removed as requested) ────────────────────────
+function toggleAdmin() {
+    // Redirects to email inbox as the storage location
+    window.location.href = "mailto:wiradentalpractice@gmail.com?subject=Booking%20Inquiries";
+}
+
+// ── UI Helpers ──────────────────────────────────────────────────────────
 function showStep(name) {
-    ['date','time','form','confirm'].forEach(s => {
+    ['date', 'time', 'form', 'confirm'].forEach(s => {
         document.getElementById('step-' + s).style.display = s === name ? 'block' : 'none';
     });
 }
 
-function toggleAdmin() {
-    alert("On GitHub Pages, you can view your bookings in your email inbox.");
-}
+function goBack(step) { showStep(step); }
+
+function bookAnother() { location.reload(); }
 
 showStep('date');

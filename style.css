@@ -67,6 +67,12 @@ p {
     font-size: 1rem;
     color: #EEF2F9;
 }
+p2 {
+    margin-top: 0px;
+    font-family: "Lora", serif;
+    font-size: 1rem;
+    color: #091528;
+}
 main {
     line-height: 1.5;
     padding: 2rem;
@@ -206,4 +212,12 @@ h2 a:hover {
 .copyright {
     margin-left: 20px;   
     margin-top: 10px;
+}
+
+.form-book {
+    background-color: #091528;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
 }
