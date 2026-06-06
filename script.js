@@ -7,6 +7,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, onValue, push, off } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+// Initialize EmailJS directly in the script
+(function(){
+    emailjs.init("xflDajxK7KdzCGn-8"); // Your public key
+})();
+
 // -- Replace all values below with your real API keys --
 const firebaseConfig = {
     apiKey: "AIzaSyCCUFVM4AR54ImP_RrQvYvNiXZq6SkcMp0",
@@ -19,8 +24,8 @@ const firebaseConfig = {
 };
 
 const EMAILJS_PUBLIC_KEY = "xflDajxK7KdzCGn-8";
-const EMAILJS_SERVICE_ID = "service_5uu042s";
-const EMAILJS_TEMPLATE_ID = "template_5fdmlsj";
+var EMAILJS_SERVICE_ID = "service_5uu042s";
+var EMAILJS_TEMPLATE_ID = "template_5fdmlsj";
 
 const TIME_SLOTS = [
     '13:00/13.30','14:00/14.30','15:00/15:30','16:00/16:30','17:00/17:30','18:00/18.30'
