@@ -168,11 +168,30 @@ const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:
   }
 
   function renderAdmin() {
-    const bookings = getAllBookings().reverse();
-    const el = document.getElementById('admin-list');
-    if (!bookings.length) {
-      el.innerHTML = '<div class="no-bookings">No bookings yet. Complete a booking above to see it here.</div>';
-      return;
+    const password = prompt("Enter Doctor's Password:");
+    if (!password) return; // Exit if they click cancel
+
+    fetch('allbooks.php?auth=' + password)
+        .then(r => {
+            if (r.status === 403) {
+                alert("Incorrect password!");
+                return [];
+            }
+            return r.json();
+        })
+        .then(bookings => {
+            if (!Array.isArray(bookings)) return;
+            const el = document.getElementById('admin-list');
+            // ... (rest of your existing render code here)
+            el.innerHTML = bookings.reverse().map(b => `
+              <div class="booking-card">
+                <span class="bc-badge">${b.time}</span>
+                <div class="bc-name">${b.name}</div>
+                <div class="bc-info">${b.service} · ${b.date} · ${b.phone}</div>
+              </div>`).join('');
+        });
+}
+
     }
     el.innerHTML = bookings.map(b => `
       <div class="booking-card">
