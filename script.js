@@ -34,18 +34,23 @@ document.addEventListener("DOMContentLoaded", function() {
   const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
   let selectedDate = null;
   let selectedTime = null;
+  let adminOpen = false;
 
   function renderSlots() {
     fetch('get_slots.php?date=' + selectedDate)
-      .then(r => r.json())
-      .then(booked => buildSlotGrid(booked));
+      .then(r => r.text())
+      .then(text => {
+        const booked = text ? text.split(',') : [];
+        buildSlotGrid(booked);
+      });
   }
 
   function buildSlotGrid(booked) {
     document.getElementById('slots-grid').innerHTML = TIME_SLOTS.map(slot => {
       const isBooked = booked.includes(slot);
-      return `<button class="slot ${isBooked ? 'booked' : 'available'}" ${isBooked ? 'disabled' : ''} onclick="selectTime('${slot}')">
-        ${slot} <small>${isBooked ? 'Booked' : 'Available'}</small></button>`;
+      return `<button class="slot ${isBooked ? 'booked' : 'available'}" 
+              ${isBooked ? 'disabled' : ''} onclick="selectTime('${slot}')">
+              ${slot} <small>${isBooked ? 'Booked' : 'Available'}</small></button>`;
     }).join('');
   }
 
@@ -61,21 +66,33 @@ document.addEventListener("DOMContentLoaded", function() {
 
     fetch('book.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(booking)
-    }).then(r => r.json()).then(res => {
-      if (res.success) showStep('confirm');
-      else alert('Error saving booking.');
+    }).then(r => r.text()).then(res => {
+      if (res === "success") showStep('confirm');
+      else alert('Error: ' + res);
     });
   }
 
+  function toggleAdmin() {
+    adminOpen = !adminOpen;
+    document.getElementById('admin-panel').style.display = adminOpen ? 'block' : 'none';
+    if (adminOpen) renderAdmin();
+  }
+
   function renderAdmin() {
-    const pass = prompt("Enter Password:");
+    const pass = prompt("Enter Dentist's Password:");
+    if (!pass) return;
+    
     fetch('get_all.php?auth=' + encodeURIComponent(pass))
-      .then(r => r.json())
-      .then(data => {
-        document.getElementById('admin-list').innerHTML = data.map(b => 
-          `<div class="booking-card">${b.time} - ${b.name} (${b.date})</div>`).join('');
+      .then(r => r.text())
+      .then(text => {
+        const el = document.getElementById('admin-list');
+        if (!text.trim()) { el.innerHTML = "No bookings."; return; }
+        
+        const rows = text.trim().split('\n');
+        el.innerHTML = rows.map(row => {
+          const [name, phone, service, date, time] = row.split('|');
+          return `<div class="booking-card">${date} ${time} - ${name} (${phone})</div>`;
+        }).join('');
       });
   }
-  // Keep your showStep, handleDateChange, etc. as they were.
