@@ -9,36 +9,49 @@ import { getDatabase, ref, onValue, push, off } from "https://www.gstatic.com/fi
 
 // -- Replace all values below with your real API keys --
 const firebaseConfig = {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyCCUFVM4AR54ImP_RrQvYvNiXZq6SkcMp0",
+    authDomain: "wiradentist-1947f.firebaseapp.com",
+    databaseURL: "https://wiradentist-1947f-default-rtdb.firebaseio.com",
+    projectId: "wiradentist-1947f",
+    storageBucket: "wiradentist-1947f.firebasestorage.app",
+    messagingSenderId: "916884972357",
+    appId: "1:916884972357:web:1227db147595e129f9d42c",
 };
 
-const EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY";
-const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
-const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+const EMAILJS_PUBLIC_KEY = "xflDajxK7KdzCGn-8";
+const EMAILJS_SERVICE_ID = "service_5uu042s";
+const EMAILJS_TEMPLATE_ID = "template_5fdmlsj";
 
 const TIME_SLOTS = [
-    '12:30','13:00','13:30','14:00','14:30','15:00',
-    '15:30','16:00','16:30','17:00','17:30','18:00'
+    '13:00/13.30','14:00/14.30','15:00/15:30','16:00/16:30','17:00/17:30','18:00/18.30'
 ];
 
 // ─── 2. INITIALIZATION ───────────────────────────────────────────────────────
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+let app, db;
 
-if (typeof emailjs !== "undefined") {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
+try {
+    app = initializeApp(firebaseConfig);
+    db = getDatabase(app);
+} catch (error) {
+    console.error("Firebase Initialization Error:", error);
+}
+
+if (typeof emailjs !== "undefined" && EMAILJS_PUBLIC_KEY !== "xflDajxK7KdzCGn-8") {
+    emailjs.init(xflDajxK7KdzCGn-8);
 }
 
 // ─── 3. GLOBAL UI HANDLERS (Navbar & Contact Buttons) ────────────────────────
 
-document.addEventListener("DOMContentLoaded", () => {
+// Modules execute after the DOM is parsed, so we invoke initialization immediately
+// rather than waiting for DOMContentLoaded, which causes race conditions.
+initGlobalUI();
+
+if (document.getElementById('step-date')) {
+    initBookingFlow();
+}
+
+function initGlobalUI() {
     // Banner Hide/Show on Scroll
     const banner = document.querySelector('.banner');
     let lastScrollY = window.scrollY;
@@ -80,12 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.open('http://maps.google.com/?q=Galeri+Niaga+Mediterania+2+Blok+J8D', '_blank');
         });
     }
-
-    // Initialize Booking Logic if on booking.html
-    if (document.getElementById('step-date')) {
-        initBookingFlow();
-    }
-});
+}
 
 // ─── 4. BOOKING SYSTEM LOGIC ─────────────────────────────────────────────────
 
@@ -162,9 +170,15 @@ function initBookingFlow() {
         detachSlotsListener();
         slotsGrid.innerHTML = '<p style="color:#9e8e7e; font-size:13px;">Loading availability...</p>';
 
+        if (!db) {
+            console.warn("Database not initialized. Displaying all slots as available.");
+            buildSlotGrid([]);
+            return;
+        }
+
         const bookingsRef = ref(db, 'bookings');
         
-        // Listen in real-time
+        // Listen in real-time. Added error callback so UI doesn't freeze.
         slotsListenerRef = onValue(bookingsRef, (snapshot) => {
             const allBookings = snapshot.val() || {};
             const bookedTimes = Object.values(allBookings)
@@ -172,11 +186,15 @@ function initBookingFlow() {
                 .map(b => b.time);
 
             buildSlotGrid(bookedTimes);
+        }, (error) => {
+            console.error("Firebase Read Error (Check Rules/Keys):", error);
+            // Render all slots so the user isn't stuck on a broken screen
+            buildSlotGrid([]); 
         });
     }
 
     function detachSlotsListener() {
-        if (slotsListenerRef) {
+        if (slotsListenerRef && db) {
             const bookingsRef = ref(db, 'bookings');
             off(bookingsRef, 'value', slotsListenerRef);
             slotsListenerRef = null;
@@ -234,42 +252,57 @@ function initBookingFlow() {
             bookedAt: new Date().toISOString()
         };
 
-        // 1. Push to Firebase
+        // If DB isn't connected, bypass Firebase and go straight to EmailJS
+        if (!db) {
+            sendEmail(bookingData);
+            return;
+        }
+
         const bookingsRef = ref(db, 'bookings');
         push(bookingsRef, bookingData)
             .then(() => {
-                // 2. Send EmailJS
-                return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                    patient_name: name,
-                    patient_phone: phone,
-                    service: service,
-                    date: formatDate(selectedDate),
-                    time: selectedTime,
-                    notes: notes || '(none)'
-                });
-            })
-            .then(() => {
-                showConfirmation(bookingData);
+                sendEmail(bookingData);
             })
             .catch(error => {
-                console.error('Booking Error:', error);
-                // Edge case: Firebase succeeded, EmailJS failed. Still show confirmation to user.
-                showConfirmation(bookingData);
-            })
-            .finally(() => {
-                btnConfirm.disabled = false;
-                btnConfirm.textContent = '✓ Confirm Appointment';
-                sendingMsg.style.display = 'none';
+                console.error('Firebase Push Error:', error);
+                // Edge case: Firebase fails (e.g. write rules), still try sending the email
+                sendEmail(bookingData);
             });
     }
 
-    function showConfirmation(booking) {
+    function sendEmail(bookingData) {
+        if (typeof emailjs === "undefined" || EMAILJS_SERVICE_ID === "YOUR_SERVICE_ID") {
+            console.warn("EmailJS not fully configured. Simulating success.");
+            finalizeBooking(bookingData);
+            return;
+        }
+
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            patient_name: bookingData.name,
+            patient_phone: bookingData.phone,
+            service: bookingData.service,
+            date: formatDate(bookingData.date),
+            time: bookingData.time,
+            notes: bookingData.notes || '(none)'
+        })
+        .then(() => finalizeBooking(bookingData))
+        .catch(error => {
+            console.error('EmailJS Error:', error);
+            finalizeBooking(bookingData);
+        });
+    }
+
+    function finalizeBooking(bookingData) {
+        btnConfirm.disabled = false;
+        btnConfirm.textContent = '✓ Confirm Appointment';
+        document.getElementById('sending-msg').style.display = 'none';
+        
         document.getElementById('confirm-details').innerHTML = `
-            👤 ${booking.name}<br>
-            🦷 ${booking.service}<br>
-            📅 ${formatDate(booking.date)}<br>
-            🕐 ${booking.time}
-            ${booking.notes ? `<br>📝 <em>${booking.notes}</em>` : ''}
+            👤 ${bookingData.name}<br>
+            🦷 ${bookingData.service}<br>
+            📅 ${formatDate(bookingData.date)}<br>
+            🕐 ${bookingData.time}
+            ${bookingData.notes ? `<br>📝 <em>${bookingData.notes}</em>` : ''}
         `;
         showStep('confirm');
     }

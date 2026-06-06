@@ -264,7 +264,7 @@ p {
 /* Time Slots Grid */
 .slots-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
     gap: 10px;
     margin-bottom: 15px;
 }
@@ -357,4 +357,48 @@ p {
 /* Confirmation Screen */
 .confirm-icon { font-size: 40px; color: #F1D274; text-align: center; margin-bottom: 10px; }
 .confirm-title { font-size: 1.5rem; text-align: center; color: #091528; margin-bottom: 5px; }
+.confirm-note { font-size: 1rem; text-align: center; color: #091528; margin-bottom: 5px; }
 .confirm-sub { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
+
+/* =========================================
+   6. ANIMATIONS & TRANSITIONS
+========================================= */
+
+/* Creates the smooth fade and slide-up effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px); /* Starts slightly lower */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);    /* Slides into place */
+    }
+}
+
+/* Apply the fade-in animation to all the form steps */
+#step-date, 
+#step-time, 
+#step-form, 
+#step-confirm {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Add a smooth "press down" effect when clicking buttons and available slots */
+.btn-primary:active, 
+.btn-outline:active, 
+.btn-back:active, 
+.slot.available:active {
+    transform: scale(0.96); /* Shrinks it by 4% when tapped */
+    transition: transform 0.1s ease; /* Makes the shrink lightning fast but smooth */
+}
+
+/* Add a hover lift effect to the primary button */
+.btn-primary {
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(9, 21, 40, 0.2);
+}
