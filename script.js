@@ -7,28 +7,22 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, onValue, push, off } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// Initialize EmailJS directly in the script
-(function(){
-    emailjs.init("xflDajxK7KdzCGn-8"); // Your public key
-})();
+// EmailJS has been removed from booking flow.
+// Daily summary emails are handled server-side via GitHub Actions.
 
-// -- Replace all values below with your real API keys --
 const firebaseConfig = {
-    apiKey: "AIzaSyCCUFVM4AR54ImP_RrQvYvNiXZq6SkcMp0",
-    authDomain: "wiradentist-1947f.firebaseapp.com",
-    databaseURL: "https://wiradentist-1947f-default-rtdb.firebaseio.com",
-    projectId: "wiradentist-1947f",
-    storageBucket: "wiradentist-1947f.firebasestorage.app",
+    apiKey:            "AIzaSyCCUFVM4AR54ImP_RrQvYvNiXZq6SkcMp0",
+    authDomain:        "wiradentist-1947f.firebaseapp.com",
+    databaseURL:       "https://wiradentist-1947f-default-rtdb.firebaseio.com",
+    projectId:         "wiradentist-1947f",
+    storageBucket:     "wiradentist-1947f.firebasestorage.app",
     messagingSenderId: "916884972357",
-    appId: "1:916884972357:web:1227db147595e129f9d42c",
+    appId:             "1:916884972357:web:1227db147595e129f9d42c",
 };
 
-const EMAILJS_PUBLIC_KEY = "xflDajxK7KdzCGn-8";
-var EMAILJS_SERVICE_ID = "service_5uu042s";
-var EMAILJS_TEMPLATE_ID = "template_5fdmlsj";
-
 const TIME_SLOTS = [
-    '13:00/13:30', '14:00/14:30', '15:00/15:30', '16:00/16:30', '17:00/17:30', '18:00/18:30'
+    '13:00/13:30', '14:00/14:30', '15:00/15:30',
+    '16:00/16:30', '17:00/17:30', '18:00/18:30'
 ];
 
 // ─── 2. INITIALIZATION ───────────────────────────────────────────────────────
@@ -37,20 +31,13 @@ let app, db;
 
 try {
     app = initializeApp(firebaseConfig);
-    db = getDatabase(app);
+    db  = getDatabase(app);
 } catch (error) {
     console.error("Firebase Initialization Error:", error);
 }
 
-// Fixed: Added missing quotes around the fallback key string to prevent script halts
-if (typeof emailjs !== "undefined" && EMAILJS_PUBLIC_KEY !== "xflDajxK7KdzCGn-8") {
-    emailjs.init("xflDajxK7KdzCGn-8");
-}
+// ─── 3. GLOBAL UI HANDLERS ───────────────────────────────────────────────────
 
-// ─── 3. GLOBAL UI HANDLERS (Navbar & Contact Buttons) ────────────────────────
-
-// Modules execute after the DOM is parsed, so we invoke initialization immediately
-// rather than waiting for DOMContentLoaded, which causes race conditions.
 initGlobalUI();
 
 if (document.getElementById('step-date')) {
@@ -61,7 +48,7 @@ function initGlobalUI() {
     // Banner Hide/Show on Scroll
     const banner = document.querySelector('.banner');
     let lastScrollY = window.scrollY;
-    
+
     if (banner) {
         window.addEventListener('scroll', () => {
             if (window.scrollY > lastScrollY) {
@@ -83,7 +70,10 @@ function initGlobalUI() {
     }
 
     // Footer Phone Buttons (Both Pages)
-    const phoneBtns = [document.getElementById('btn-phone'), document.getElementById('btn-phone-footer')];
+    const phoneBtns = [
+        document.getElementById('btn-phone'),
+        document.getElementById('btn-phone-footer')
+    ];
     phoneBtns.forEach(btn => {
         if (btn) {
             btn.addEventListener('click', () => {
@@ -103,7 +93,8 @@ function initGlobalUI() {
 
 // ─── 4. BOOKING SYSTEM LOGIC ─────────────────────────────────────────────────
 
-// ⚠️ PASTE YOUR LIVE GOOGLE WEB APP URL HERE
+// Google Apps Script Web App URL
+// When a booking is submitted: saves to Google Sheets + creates Google Calendar event
 const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzmkALXEANbxXidjSY__L1VVion6Zk0PbTYAROJUxAHw5afjZ09pQCMgropiNFcYIpt/exec";
 
 function initBookingFlow() {
@@ -112,11 +103,11 @@ function initBookingFlow() {
     let slotsListenerRef = null;
 
     // Element References
-    const datePicker = document.getElementById('datePicker');
-    const slotsGrid = document.getElementById('slots-grid');
-    const btnConfirm = document.getElementById('btn-confirm');
+    const datePicker    = document.getElementById('datePicker');
+    const slotsGrid     = document.getElementById('slots-grid');
+    const btnConfirm    = document.getElementById('btn-confirm');
     const btnBookAnother = document.getElementById('btn-book-another');
-    const backBtns = document.querySelectorAll('.btn-back');
+    const backBtns      = document.querySelectorAll('.btn-back');
 
     // Restrict Date Picker to future dates
     const todayStr = new Date().toISOString().split('T')[0];
@@ -143,6 +134,7 @@ function initBookingFlow() {
     });
 
     // --- Core Functions ---
+
     function showStep(stepName) {
         ['date', 'time', 'form', 'confirm'].forEach(s => {
             const el = document.getElementById('step-' + s);
@@ -184,7 +176,7 @@ function initBookingFlow() {
         }
 
         const bookingsRef = ref(db, 'bookings');
-        
+
         slotsListenerRef = onValue(bookingsRef, (snapshot) => {
             const allBookings = snapshot.val() || {};
             const bookedTimes = Object.values(allBookings)
@@ -194,7 +186,7 @@ function initBookingFlow() {
             buildSlotGrid(bookedTimes);
         }, (error) => {
             console.error("Firebase Read Error:", error);
-            buildSlotGrid([]); 
+            buildSlotGrid([]);
         });
     }
 
@@ -210,8 +202,8 @@ function initBookingFlow() {
         slotsGrid.innerHTML = TIME_SLOTS.map(slot => {
             const isBooked = bookedTimes.includes(slot);
             return `
-                <button class="slot ${isBooked ? 'booked' : 'available'}" 
-                        ${isBooked ? 'disabled' : ''} 
+                <button class="slot ${isBooked ? 'booked' : 'available'}"
+                        ${isBooked ? 'disabled' : ''}
                         data-time="${slot}">
                     ${slot}
                     <small>${isBooked ? 'Booked' : 'Available'}</small>
@@ -231,10 +223,10 @@ function initBookingFlow() {
     }
 
     function submitBooking() {
-        const name = document.getElementById('f-name').value.trim();
-        const phone = document.getElementById('f-phone').value.trim();
+        const name    = document.getElementById('f-name').value.trim();
+        const phone   = document.getElementById('f-phone').value.trim();
         const service = document.getElementById('f-service').value;
-        const notes = document.getElementById('f-notes').value.trim();
+        const notes   = document.getElementById('f-notes').value.trim();
 
         if (!name || !phone) {
             alert('Please fill in your name and WhatsApp number.');
@@ -243,22 +235,23 @@ function initBookingFlow() {
 
         // UI Loading State
         const sendingMsg = document.getElementById('sending-msg');
-        btnConfirm.disabled = true;
-        btnConfirm.textContent = 'Sending...';
+        btnConfirm.disabled     = true;
+        btnConfirm.textContent  = 'Sending...';
         sendingMsg.style.display = 'block';
 
         const bookingData = {
-            name: name,
-            phone: phone,
-            service: service,
-            notes: notes || '',
-            date: selectedDate,
-            time: selectedTime,
+            name:     name,
+            phone:    phone,
+            service:  service,
+            notes:    notes || '',
+            date:     selectedDate,
+            time:     selectedTime,
             bookedAt: new Date().toISOString()
         };
 
-        // 1. Save to Firebase first
+        // 1. Save to Firebase
         if (!db) {
+            // No Firebase — go straight to Google
             sendToGoogleScript(bookingData);
             return;
         }
@@ -266,48 +259,45 @@ function initBookingFlow() {
         const bookingsRef = ref(db, 'bookings');
         push(bookingsRef, bookingData)
             .then(() => {
-                // 2. Sync to Google Sheet & Calendar after Firebase succeeds
+                // 2. Firebase saved — now sync to Google Sheets + Calendar
                 sendToGoogleScript(bookingData);
             })
             .catch(error => {
                 console.error('Firebase Push Error:', error);
+                // Still try Google even if Firebase failed
                 sendToGoogleScript(bookingData);
             });
     }
 
-    // Sends data to your standalone Google Apps Script
-        function sendToGoogleScript(bookingData) {
-        if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL === "https://script.google.com/macros/s/AKfycbzmkALXEANbxXidjSY__L1VVion6Zk0PbTYAROJUxAHw5afjZ09pQCMgropiNFcYIpt/exec") {
-            console.warn("GAS URL missing.");
-            finalizeBooking(bookingData);
-            return;
-        }
+    // ── Sends booking to Google Apps Script ────────────────────────────────
+    // Apps Script writes to Google Sheets AND creates a Google Calendar event.
+    // Uses keepalive so the request completes even if the user navigates away.
+    function sendToGoogleScript(bookingData) {
+        console.log("Sending to Google Sheets & Calendar...");
 
-        console.log("Dispatching to Google...");
-
-        // Simplified fetch request to prevent dropped payloads
         fetch(GAS_WEB_APP_URL, {
-            method: 'POST',
-            body: JSON.stringify(bookingData)
+            method:   'POST',
+            body:     JSON.stringify(bookingData),
+            keepalive: true   // ensures the request finishes even on page change
         })
-        .then(response => response.text()) // Changed to read the raw response
+        .then(response => response.text())
         .then(result => {
             console.log("Google Apps Script response:", result);
         })
         .catch(err => {
-            console.error('Google Fetch Error:', err);
+            console.error('Google Apps Script fetch error:', err);
         })
         .finally(() => {
+            // Always show the confirmation screen regardless of outcome
             finalizeBooking(bookingData);
         });
     }
 
-
     function finalizeBooking(bookingData) {
-        btnConfirm.disabled = false;
+        btnConfirm.disabled    = false;
         btnConfirm.textContent = '✓ Confirm Appointment';
         document.getElementById('sending-msg').style.display = 'none';
-        
+
         document.getElementById('confirm-details').innerHTML = `
             👤 ${bookingData.name}<br>
             📞 ${bookingData.phone}<br>
@@ -323,7 +313,7 @@ function initBookingFlow() {
         selectedDate = null;
         selectedTime = null;
         detachSlotsListener();
-        
+
         datePicker.value = '';
         ['f-name', 'f-phone', 'f-notes'].forEach(id => {
             document.getElementById(id).value = '';
