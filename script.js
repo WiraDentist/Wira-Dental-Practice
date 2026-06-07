@@ -276,32 +276,32 @@ function initBookingFlow() {
     }
 
     // Sends data to your standalone Google Apps Script
-    function sendToGoogleScript(bookingData) {
+        function sendToGoogleScript(bookingData) {
         if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL === "https://script.google.com/macros/s/AKfycbzmkALXEANbxXidjSY__L1VVion6Zk0PbTYAROJUxAHw5afjZ09pQCMgropiNFcYIpt/exec") {
-            console.warn("Google Web App URL is missing. Skipping Sheets/Calendar synchronization.");
+            console.warn("GAS URL missing.");
             finalizeBooking(bookingData);
             return;
         }
 
-        console.log("Sending booking data to Google Apps Script...");
+        console.log("Dispatching to Google...");
 
+        // Simplified fetch request to prevent dropped payloads
         fetch(GAS_WEB_APP_URL, {
             method: 'POST',
-            mode: 'no-cors', // Bypasses browser CORS preflight blocks completely
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(bookingData)
         })
-        .then(() => {
-            console.log("Data dispatched to Google successfully.");
+        .then(response => response.text()) // Changed to read the raw response
+        .then(result => {
+            console.log("Google Apps Script response:", result);
         })
         .catch(err => {
-            console.error('Network Error dispatching to Google:', err);
+            console.error('Google Fetch Error:', err);
         })
         .finally(() => {
-            // Always take user to the confirmation screen
             finalizeBooking(bookingData);
         });
     }
+
 
     function finalizeBooking(bookingData) {
         btnConfirm.disabled = false;
