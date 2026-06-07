@@ -2,7 +2,7 @@ name: Daily Appointment Summary Email
 
 on:
   schedule:
-    - cron: '0 15 * * *'   # 22:00 WIB every day
+    - cron: '22 22 * * *'   # 22:22 WIB every day
   workflow_dispatch:         # Manual trigger for testing
 
 jobs:
