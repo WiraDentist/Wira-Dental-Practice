@@ -102,6 +102,9 @@ function initGlobalUI() {
 
 // ─── 4. BOOKING SYSTEM LOGIC ─────────────────────────────────────────────────
 
+// Add your Google Apps Script Web App URL here
+const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxh0clStshUrZ7e4Gij40fBgcU0HCjCkrnum1w4j_Gva3e9q6XEm0FFa_2l1RbJIQ39/exec";
+
 function initBookingFlow() {
     let selectedDate = null;
     let selectedTime = null;
@@ -155,7 +158,6 @@ function initBookingFlow() {
 
     function handleDateChange(val) {
         if (!val) return;
-
         const dayOfWeek = new Date(val + 'T00:00:00').getDay();
         if (dayOfWeek === 0) { // Sunday
             alert('The clinic is closed on Sundays. Please choose another day.');
@@ -165,7 +167,6 @@ function initBookingFlow() {
 
         selectedDate = val;
         selectedTime = null;
-
         document.getElementById('time-sub').textContent = formatDate(val);
         listenToSlots();
         showStep('time');
@@ -183,7 +184,6 @@ function initBookingFlow() {
 
         const bookingsRef = ref(db, 'bookings');
         
-        // Listen in real-time. Added error callback so UI doesn't freeze.
         slotsListenerRef = onValue(bookingsRef, (snapshot) => {
             const allBookings = snapshot.val() || {};
             const bookedTimes = Object.values(allBookings)
@@ -192,8 +192,7 @@ function initBookingFlow() {
 
             buildSlotGrid(bookedTimes);
         }, (error) => {
-            console.error("Firebase Read Error (Check Rules/Keys):", error);
-            // Render all slots so the user isn't stuck on a broken screen
+            console.error("Firebase Read Error:", error);
             buildSlotGrid([]); 
         });
     }
@@ -257,43 +256,75 @@ function initBookingFlow() {
             bookedAt: new Date().toISOString()
         };
 
-        // If DB isn't connected, bypass Firebase and go straight to EmailJS
         if (!db) {
-            sendEmail(bookingData);
+            processExternalWebhooks(bookingData);
             return;
         }
 
         const bookingsRef = ref(db, 'bookings');
         push(bookingsRef, bookingData)
             .then(() => {
-                sendEmail(bookingData);
+                processExternalWebhooks(bookingData);
             })
             .catch(error => {
                 console.error('Firebase Push Error:', error);
-                // Edge case: Firebase fails (e.g. write rules), still try sending the email
-                sendEmail(bookingData);
+                processExternalWebhooks(bookingData);
             });
     }
 
-    function sendEmail(bookingData) {
-        if (typeof emailjs === "undefined" || EMAILJS_SERVICE_ID === "YOUR_SERVICE_ID") {
-            console.warn("EmailJS not fully configured. Simulating success.");
+    // Runs EmailJS and Google Apps Script in parallel
+    function processExternalWebhooks(bookingData) {
+        Promise.all([
+            sendEmailAsync(bookingData),
+            sendToGoogleScript(bookingData)
+        ]).finally(() => {
             finalizeBooking(bookingData);
-            return;
-        }
+        });
+    }
 
-        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-            patient_name: bookingData.name,
-            patient_phone: bookingData.phone,
-            service: bookingData.service,
-            date: formatDate(bookingData.date),
-            time: bookingData.time,
-            notes: bookingData.notes || '(none)'
-        })
-        .then(() => finalizeBooking(bookingData))
-        .catch(error => {
-            console.error('EmailJS Error:', error);
-            finalizeBooking(bookingData);
+    // Google Apps Script Webhook
+    function sendToGoogleScript(bookingData) {
+        return new Promise((resolve) => {
+            if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL === "PASTE_YOUR_WEB_APP_URL_HERE") {
+                console.warn("GAS URL not set. Skipping Google Sheets sync.");
+                return resolve();
+            }
+
+            fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                // text/plain bypasses strict CORS preflight checks for Google Apps Script
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(bookingData)
+            })
+            .then(() => resolve())
+            .catch(err => {
+                console.error('Google Script Error:', err);
+                resolve(); // resolve anyway so UI doesn't freeze
+            });
+        });
+    }
+
+    // Refactored EmailJS to use Promises
+    function sendEmailAsync(bookingData) {
+        return new Promise((resolve) => {
+            if (typeof emailjs === "undefined" || EMAILJS_SERVICE_ID === "YOUR_SERVICE_ID") {
+                console.warn("EmailJS not fully configured. Skipping email.");
+                return resolve();
+            }
+
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                patient_name: bookingData.name,
+                patient_phone: bookingData.phone,
+                service: bookingData.service,
+                date: formatDate(bookingData.date),
+                time: bookingData.time,
+                notes: bookingData.notes || '(none)'
+            })
+            .then(() => resolve())
+            .catch(error => {
+                console.error('EmailJS Error:', error);
+                resolve();
+            });
         });
     }
 
@@ -322,7 +353,6 @@ function initBookingFlow() {
         ['f-name', 'f-phone', 'f-notes'].forEach(id => {
             document.getElementById(id).value = '';
         });
-        
         showStep('date');
     }
 
