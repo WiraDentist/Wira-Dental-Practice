@@ -102,8 +102,8 @@ function initGlobalUI() {
 
 // ─── 4. BOOKING SYSTEM LOGIC ─────────────────────────────────────────────────
 
-// Add your Google Apps Script Web App URL here
-const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxh0clStshUrZ7e4Gij40fBgcU0HCjCkrnum1w4j_Gva3e9q6XEm0FFa_2l1RbJIQ39/exec";
+// ⚠️ PASTE YOUR LIVE GOOGLE WEB APP URL HERE
+const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzmkALXEANbxXidjSY__L1VVion6Zk0PbTYAROJUxAHw5afjZ09pQCMgropiNFcYIpt/exec";
 
 function initBookingFlow() {
     let selectedDate = null;
@@ -256,75 +256,49 @@ function initBookingFlow() {
             bookedAt: new Date().toISOString()
         };
 
+        // 1. Save to Firebase first
         if (!db) {
-            processExternalWebhooks(bookingData);
+            sendToGoogleScript(bookingData);
             return;
         }
 
         const bookingsRef = ref(db, 'bookings');
         push(bookingsRef, bookingData)
             .then(() => {
-                processExternalWebhooks(bookingData);
+                // 2. Sync to Google Sheet & Calendar after Firebase succeeds
+                sendToGoogleScript(bookingData);
             })
             .catch(error => {
                 console.error('Firebase Push Error:', error);
-                processExternalWebhooks(bookingData);
+                sendToGoogleScript(bookingData);
             });
     }
 
-    // Runs EmailJS and Google Apps Script in parallel
-    function processExternalWebhooks(bookingData) {
-        Promise.all([
-            sendEmailAsync(bookingData),
-            sendToGoogleScript(bookingData)
-        ]).finally(() => {
-            finalizeBooking(bookingData);
-        });
-    }
-
-    // Google Apps Script Webhook
+    // Sends data to your standalone Google Apps Script
     function sendToGoogleScript(bookingData) {
-        return new Promise((resolve) => {
-            if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL === "PASTE_YOUR_WEB_APP_URL_HERE") {
-                console.warn("GAS URL not set. Skipping Google Sheets sync.");
-                return resolve();
-            }
+        if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL === "https://script.google.com/macros/s/AKfycbzmkALXEANbxXidjSY__L1VVion6Zk0PbTYAROJUxAHw5afjZ09pQCMgropiNFcYIpt/exec") {
+            console.warn("Google Web App URL is missing. Skipping Sheets/Calendar synchronization.");
+            finalizeBooking(bookingData);
+            return;
+        }
 
-            fetch(GAS_WEB_APP_URL, {
-                method: 'POST',
-                // text/plain bypasses strict CORS preflight checks for Google Apps Script
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(bookingData)
-            })
-            .then(() => resolve())
-            .catch(err => {
-                console.error('Google Script Error:', err);
-                resolve(); // resolve anyway so UI doesn't freeze
-            });
-        });
-    }
+        console.log("Sending booking data to Google Apps Script...");
 
-    // Refactored EmailJS to use Promises
-    function sendEmailAsync(bookingData) {
-        return new Promise((resolve) => {
-            if (typeof emailjs === "undefined" || EMAILJS_SERVICE_ID === "YOUR_SERVICE_ID") {
-                console.warn("EmailJS not fully configured. Skipping email.");
-                return resolve();
-            }
-
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                patient_name: bookingData.name,
-                patient_phone: bookingData.phone,
-                service: bookingData.service,
-                date: formatDate(bookingData.date),
-                time: bookingData.time,
-                notes: bookingData.notes || '(none)'
-            })
-            .then(() => resolve())
-            .catch(error => {
-                console.error('EmailJS Error:', error);
-                resolve();
-            });
+        fetch(GAS_WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Bypasses browser CORS preflight blocks completely
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(bookingData)
+        })
+        .then(() => {
+            console.log("Data dispatched to Google successfully.");
+        })
+        .catch(err => {
+            console.error('Network Error dispatching to Google:', err);
+        })
+        .finally(() => {
+            // Always take user to the confirmation screen
+            finalizeBooking(bookingData);
         });
     }
 
@@ -356,7 +330,6 @@ function initBookingFlow() {
         showStep('date');
     }
 
-    // --- Date Formatting Helpers ---
     function formatDate(str) {
         return new Date(str + 'T00:00:00').toLocaleDateString('en-GB', {
             weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
@@ -369,6 +342,5 @@ function initBookingFlow() {
         });
     }
 
-    // Initialize the flow
     showStep('date');
 }
