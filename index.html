@@ -39,7 +39,23 @@
     </header>
     <main>
         <section id="about">
-            <h3>Our Legacy</h3>
+            <h3 id="welcome-message">Greetings!
+<script>
+    // 1. Check the browser's memory to see if we saved a name during a previous visit
+    const savedName = localStorage.getItem("savedCustomerName");
+    // 2. If we found a saved name, change the greeting!
+    if (savedName) {
+        document.getElementById("welcome-message").innerText = "Welcome back, " + savedName + "!";
+    }
+    // --- HOW TO SAVE THE NAME IN THE FIRST PLACE ---
+    // If you use the booking form from your CSS file, you would add this one line 
+    // to your button click script so the browser remembers them for next time:
+    function saveNameForNextTime() {
+        const nameTypedInBox = document.getElementById("customer-name").value;
+        localStorage.setItem("savedCustomerName", nameTypedInBox);
+    }
+</script>
+            </h3>
             <p class="p2">Serving you since 1996, we offer comprehensive and compassionate dental care that will not only maintain, regain, or increase your oral health, but also strive to achieve the essence of aesthetic in you.</p>
         </section>
         <section class="action-buttons">
