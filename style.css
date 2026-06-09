@@ -168,7 +168,7 @@ p {
     width: 3rem;
     height: auto;
     position: absolute;
-    left: 25px;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%); /* Keeps logo perfectly level with text row */
 }
@@ -241,7 +241,7 @@ p {
     list-style-type: none;
     display: flex;
     justify-content: center;
-    gap: 35px;
+    gap:5px;
     padding: 0;
     margin: 0;
 }
