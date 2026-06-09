@@ -24,13 +24,16 @@ body {
     background-repeat: no-repeat;
     background-attachment: scroll;
     overflow-x: hidden;
-    padding-top: 130px;
+    padding-top: 180px; /* Perfectly clearing room for the new vertical layout */
     padding-bottom: 140px;
 }
 
 main {
     line-height: 1.5;
     padding: 10px;
+    /* Seamless fade and glide whenever a tab/page is opened */
+    animation: tabContentEntrance 0.55s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+    will-change: opacity, transform;
 }
 
 section {
@@ -41,14 +44,14 @@ section {
    2. TYPOGRAPHY
 ========================================= */
 h1 {
-    font-family: "Playfair Display", serif;
+    font-family: \"Playfair Display\", serif;
     font-size: 40px;
     font-weight: 100;
     letter-spacing: 15px;
     line-height: 0.5;
     color: #F1D274;
     width: 100%;
-    text-indent: 10px;
+    text-indent: 15px; /* Matches letter-spacing perfectly to guarantee dead-centering */
 }
 
 h1 a {
@@ -63,7 +66,7 @@ h1 a:hover {
 }
 
 h2 {
-    font-family: "Lora", serif;
+    font-family: \"Lora\", serif;
     font-size: 15px;
     font-weight: 100;
     color: #F1D274;
@@ -81,14 +84,14 @@ h2 a:hover {
 }
 
 h3 {
-    font-family: "Lora", serif;
+    font-family: \"Lora\", serif;
     font-size: 2rem;
     font-weight: 100;
     color: #091528;
 }
 
 h4 {
-    font-family: "Lora", serif;
+    font-family: \"Lora\", serif;
     font-size: 12px;
     font-weight: 100;
     color: #EEF2F9;
@@ -96,42 +99,78 @@ h4 {
 
 /* Custom Paragraph Classes */
 p {
-    font-family: "Lora", serif;
+    font-family: \"Lora\", serif;
     font-size: 12px;
     color: #EEF2F9;
 }
 
 .p1 {
     margin-top: 0px;
-    font-family: "Lora", serif;
+    font-family: \"Lora\", serif;
     font-size: 12px;
     color: #EEF2F9;
 }
 
 .p2 {
     margin-top: 0px;
-    font-family: "Lora", serif;
+    font-family: \"Lora\", serif;
     font-size: 1rem;
     color: #091528;
 }
 
 .p3 {
     margin-left: 10px;
-    font-family: "Lora", serif;
+    font-family: \"Lora\", serif;
     font-size: 12px;
     color: #EEF2F9 ;
     text-decoration: none;
 }
 
 /* =========================================
-   3. LAYOUT (Header & Footer)
+   3. LAYOUT (Header & Footer Master)
 ========================================= */
+
+/* Main Header Panel (Always Stacks Vertically) */
+.banner, .banner.banner-content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    padding-top: 15px;
+    padding-bottom: 0;
+    background-color: #091528;
+    z-index: 1000;
+    box-shadow: 0 4px 10px #F1D274;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner.hide {
+    transform: translateY(-100%);
+}
+
+/* Row holding the logo and your branding text side-by-side */
+.header-brand {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative; /* Anchor for absolute elements */
+    padding: 0 40px;
+}
+
+/* Absolute layout locks logo to left, completely freeing the text block to center */
 .logo {
     width: 3rem;
     height: auto;
     position: absolute;
-    left: 10px;
-    top: 20px;
+    left: 25px;
+    top: 50%;
+    transform: translateY(-50%); /* Keeps logo perfectly level with text row */
 }
 
 .text-stack {
@@ -140,33 +179,11 @@ p {
     justify-content: center;
     align-items: center;
     gap: 15px;
-}
-
-.banner {
-    background-color: #0A1628;
-    width: 100%;
-    height: 130px;
-    display: flex;
-    position: fixed;
-    z-index: 9999;
-    top: 0px;
-    left: 0px;
-    justify-content: center;
-    align-items: center;
     text-align: center;
-    box-shadow: 0px 8px 15px -5px #F1D274;
-    transition: transform 0.3s ease-in-out;
-    color: #EEF2F9;
-}
-
-.banner.hide {
-    transform: translateY(-100%);
-}
-
-.banner-content {
     width: 100%;
 }
 
+/* Footer Container Alignment */
 .footer-banner {
     background-color: #0A1628;
     width: 100%;
@@ -197,7 +214,111 @@ p {
 }
 
 /* =========================================
-   4. BUTTONS
+   4. NAVIGATION & DROPDOWNS
+========================================= */
+
+/* The horizontal bar band running under the branding row */
+.navbar-bar {
+    width: 100%;
+    background-color: #091528;
+    margin-top: 5px;
+    padding: 6px 0;
+    position: relative;
+}
+
+/* Crisp fading horizontal accent illumination line */
+.navbar-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, rgba(241, 210, 116, 0) 0%, #F1D274 50%, rgba(241, 210, 116, 0) 100%);
+}
+
+.nav-menu {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    gap: 35px;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-menu > li {
+    position: relative;
+}
+
+/* Navigation items inside the tracker bar */
+.nav-menu > li > a, .dropbtn {
+    text-decoration: none;
+    color: #EEF2F9;
+    font-family: "Lora", serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 16px;
+    display: block;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid transparent; 
+    transition: all 0.25s ease-in-out;
+}
+
+/* GLOW FIX: Soft persistent lighting applied on .active tabs as well as hovers */
+.nav-menu > li > a:hover, 
+.nav-menu > li > a.active,
+.dropdown:hover .dropbtn {
+    color: #F1D274;
+    border-color: rgba(241, 210, 116, 0.45);
+    box-shadow: 0 0 12px rgba(241, 210, 116, 0.3); 
+    background-color: rgba(9, 21, 40, 0.7);
+}
+
+/* Dropdown Choice Panels */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 190px;
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    z-index: 1000;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 0;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(241, 210, 116, 0.3);
+}
+
+.dropdown-content li {
+    list-style-type: none;
+}
+
+.dropdown-content a {
+    color: #091528;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    font-family: "Lora", serif;
+    font-size: 13px;
+    transition: background 0.2s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #EEF2F9;
+    color: #060e1b;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* =========================================
+   5. BUTTONS
 ========================================= */
 #btn-wa, #btn-web {
     background-color: #091528;
@@ -238,7 +359,7 @@ p {
 }
 
 /* =========================================
-   5. BOOKING FORM UI
+   6. BOOKING FORM UI
 ========================================= */
 .card {
     background: white;
@@ -324,10 +445,14 @@ p {
     width: 100%;
     font-size: 16px;
     font-family: "Lora", serif;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-.btn-primary:hover { opacity: 0.9; }
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(9, 21, 40, 0.2);
+    opacity: 0.9;
+}
 
 .btn-outline {
     background-color: transparent;
@@ -364,22 +489,32 @@ p {
 .confirm-sub { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
 
 /* =========================================
-   6. ANIMATIONS & TRANSITIONS
+   7. ANIMATIONS & TRANSITIONS
 ========================================= */
 
-/* Creates the smooth fade and slide-up effect */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(15px); /* Starts slightly lower */
+        transform: translateY(15px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);    /* Slides into place */
+        transform: translateY(0);
     }
 }
 
-/* Apply the fade-in animation to all the form steps */
+/* Elegant keyframe configuration for tab-opening events */
+@keyframes tabContentEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 #step-date, 
 #step-time, 
 #step-form, 
@@ -387,21 +522,10 @@ p {
     animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* Add a smooth "press down" effect when clicking buttons and available slots */
 .btn-primary:active, 
 .btn-outline:active, 
 .btn-back:active, 
 .slot.available:active {
-    transform: scale(0.96); /* Shrinks it by 4% when tapped */
-    transition: transform 0.1s ease; /* Makes the shrink lightning fast but smooth */
-}
-
-/* Add a hover lift effect to the primary button */
-.btn-primary {
-    transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(9, 21, 40, 0.2);
+    transform: scale(0.96);
+    transition: transform 0.1s ease;
 }
